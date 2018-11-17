@@ -33,6 +33,7 @@ import javax.swing.text.ChangedCharSetException;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.util.regex.Pattern;
 
 /**
  * A Parser for HTML Documents (actually, you can specify a DTD, but
@@ -185,6 +186,8 @@ public class DocumentParser extends javax.swing.text.html.parser.Parser {
         callback.handleComment(text, getBlockStartPosition());
     }
 
+    private static final Pattern HTML_CONTENT_TYPE_PATTERN = Pattern.compile("(?i)^text/(html|plain)");
+   
     /**
      * Handle Empty Tag.
      */
@@ -197,8 +200,7 @@ public class DocumentParser extends javax.swing.text.html.parser.Parser {
                 String content = (String)atts.getAttribute(HTML.Attribute.CONTENT);
                 if (content != null) {
                     if ("content-type".equalsIgnoreCase((String)atts.getAttribute(HTML.Attribute.HTTPEQUIV))) {
-                        if (!content.equalsIgnoreCase("text/html") &&
-                                !content.equalsIgnoreCase("text/plain")) {
+                        if ( !HTML_CONTENT_TYPE_PATTERN.matcher(content).find() ) {
                             throw new ChangedCharSetException(content, false);
                         }
                     } else if ("charset" .equalsIgnoreCase((String)atts.getAttribute(HTML.Attribute.HTTPEQUIV))) {
